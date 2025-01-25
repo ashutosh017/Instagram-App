@@ -1,0 +1,132 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String  @id @default(uuid())
+  name           String
+  email          String  @unique
+  username       String  @unique
+  password       String
+  profilePic     String?
+  description    String?
+  gender         Gender?
+  followersCount Int     @default(0)
+  followingCount Int     @default(0)
+
+  followers Follower[] @relation("UserAsFollower")
+  following Follower[] @relation("UserAsFollowing")
+
+  posts         Post[]
+  likedPosts    String[]
+  savedPosts    String[]
+  privacyMode   AccountPrivacyMode?
+  notifications Notification[]      @relation("UserNotifications")
+  comments      Comment[]           @relation("Commenter")
+}
+
+model Follower {
+  id         String @id @default(uuid())
+  userId     String
+  followerId String
+  user       User   @relation("UserAsFollower", fields: [userId], references: [id])
+  follower   User   @relation("UserAsFollowing", fields: [followerId], references: [id])
+
+  @@unique([userId, followerId]) // Prevent duplicate follower relationships
+}
+
+enum AccountPrivacyMode {
+  PUBLIC
+  PRIVATE
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  PREFER_NOT_TO_SAY
+}
+
+model Post {
+  id          String    @id @default(uuid())
+  url         String
+  dateCreated DateTime  @default(now())
+  description String?
+  likes       Int       @default(0)
+  comments    Comment[]
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+}
+
+model Comment {
+  id        String    @id @default(uuid())
+  text      String
+  postId    String
+  post      Post      @relation(fields: [postId], references: [id])
+  parentId  String? // Optional for replies
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies   Comment[] @relation("CommentReplies")
+  likes     Int       @default(0)
+  dateAdded DateTime  @default(now())
+  userId    String
+  commenter User      @relation("Commenter", fields: [userId], references: [id])
+}
+
+model Notification {
+  id                  String           @id @default(uuid())
+  type                NotificationType
+  forUserId       String
+  forUser         User             @relation(fields: [forUserId], references: [id], name: "UserNotifications")
+  notificationContent String
+  read                Boolean          @default(false)
+  time                DateTime         @default(now())
+}
+
+enum NotificationType {
+  FOLLOW
+  LIKE
+  COMMENT
+  MENTION
+  SUGGESTION
+}
+
+enum Status {
+  OFFLINE
+  ONLINE
+  TYPING
+}
+
+model Message {
+  id           String        @id @default(uuid())
+  content      String
+  fromUserId   String
+  toUserId     String
+  dateSend     DateTime      @default(now())
+  dateReceived DateTime?
+  status       MessageStatus    @default(UNSEEN)
+  chat         Chat          @relation(fields: [chatId], references: [id])
+  chatId       String
+}
+
+enum MessageStatus {
+  SEEN
+  UNSEEN
+}
+
+model Chat {
+  id         String    @id @default(uuid())
+  fromUserId String
+  toUserId   String
+  messages   Message[]
+  @@unique([fromUserId, toUserId])
+}
