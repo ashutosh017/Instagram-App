@@ -1,6 +1,6 @@
 import express from "express";
 export const usersRouter = express.Router();
-import db from "@db/src";
+import db from "../db/src";
 import {
   changePasswordSchema,
   changePrivacySchema,

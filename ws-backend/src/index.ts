@@ -1,51 +1,25 @@
 import { WebSocketServer } from "ws";
-import { v4 as uuidv4 } from 'uuid';
-import WebSocket from "ws";
+import { extractUser } from "./auth";
+import { AppManager } from "./AppManager";
 
-const wss = new WebSocketServer({port:8080})
+const wss = new WebSocketServer({ port: 8080 });
 
+const App = new AppManager();
 
-wss.on("connection",(socket)=>{
-    socket.on('message',(data)=>{
-        console.log(data);
-        const parsedData = JSON.parse(JSON.stringify(data))
-        let user:User;
-        if(parsedData.type==='NEW_JOINING'){
-            const id = uuidv4();
-            const name = parsedData.name
-            const username = parsedData.usename;
-            const email = parsedData.email
-            user = {
-                socket,id,name,username,email
-            }
-            const ig = new Instagram();
-            ig.initHandler(user)
-        }
+wss.on("connection", (socket, request) => {
+  const url = request.url;
+  if (!url) {
+    return;
+  }
+  const queryParams = new URLSearchParams(url.split("?")[1]);
+  const token = queryParams.get("token") || "";
+  const user = extractUser(socket, token);
+  App.addUser(user);
 
-    })
-
-})
-
-interface User{
-    socket:WebSocket,
-    id:string,
-    name:string,
-    username:string,
-    email:string,
-}
-
-class Instagram{
-    public users:User[];
-    addUser(user){
-        this.users.push(user);
-
-    }
-    initHandler(user:User){
-        this.addUser(user)
-    }
-    constructor(){
-        this.users = [];
-    }
-
-}
-
+  socket.on("message", (data) => {
+    console.log(data.toString());
+  });
+  socket.on("close",()=>{
+    socket.close();
+  })
+});

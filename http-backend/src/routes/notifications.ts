@@ -1,5 +1,5 @@
 import express from "express";
-import db from "@db/src";
+import db from "../db/src";
 
 export const notificationsRouter = express.Router();
 
@@ -18,7 +18,7 @@ notificationsRouter.get("/",async(req,res)=>{
             }
         })
         res.status(200).json({
-            notifications:notifications.map(n=>({
+            notifications:notifications.map((n:any)=>({
                 id:n.id,
                 content:n.notificationContent,
                 time:n.time,

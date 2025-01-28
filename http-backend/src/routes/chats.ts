@@ -1,5 +1,5 @@
 import express from "express";
-import db from "@db/src";
+import db from "../db/src";
 
 export const chatsRouter = express.Router();
 
@@ -38,7 +38,7 @@ chatsRouter.get("/:chatId/messages", async(req,res)=>{
     
         res.status(200).json({
           chatId,
-          messages: messages.map((msg) => ({
+          messages: messages.map((msg:any) => ({
             id: msg.id,
             senderId: msg.fromUserId,
             receiverId: msg.toUserId,
@@ -83,7 +83,7 @@ chatsRouter.get("/chats", async (req, res) => {
           },
         });
     
-        const formattedChats = chats.map((chat) => {
+        const formattedChats = chats.map((chat:any) => {
           const lastMessage = chat.messages[0] || null;
     
           return {

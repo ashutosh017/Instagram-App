@@ -1,5 +1,6 @@
 import express from "express";
-import db from "@db/src";
+// import db from "@db/src";
+import db from '../db/src'
 import { signinSchema, signupSchema } from "../types";
 import { JWT_SECRET } from "../config";
 import bcrypt from 'bcrypt'
@@ -7,7 +8,7 @@ import jwt from 'jsonwebtoken'
 
 export const authRouter = express.Router();
 
-authRouter.post("/api/v1/signin", async(req,res)=>{
+authRouter.post("/signin", async(req,res)=>{
     const parsedSchema = signinSchema.safeParse(req.body)
     if(!parsedSchema.success){
         res.status(400).json({
@@ -41,7 +42,8 @@ authRouter.post("/api/v1/signin", async(req,res)=>{
     })
 })
 
-authRouter.post("/api/v1/signup",async(req,res)=>{
+authRouter.post("/signup",async(req,res)=>{
+    console.log("someone hit the signup endpoint")
     const parsedSchema = signupSchema.safeParse(req.body)
     if(!parsedSchema.success){
         res.status(400).json({

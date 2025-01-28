@@ -7,7 +7,7 @@ import {
   updatePostSchema,
   uploadPostSchema,
 } from "../types";
-import db from "@db/src";
+import db from "../db/src";
 import { commentSelect } from "../config";
 
 export const postsRouter = express.Router();
@@ -368,7 +368,7 @@ postsRouter.delete("/saved-posts", async (req, res) => {
     if (!user) {
       throw new Error("user not found");
     }
-    const filteredSavedPosts = user.savedPosts.filter((id) => id !== postId);
+    const filteredSavedPosts = user.savedPosts.filter((id:any) => id !== postId);
     await db.user.update({
       where: {
         id: req.userId,
