@@ -26,14 +26,14 @@ export const sendMessageSchema = z.object({
 });
 
 export const editProfileSchema = z.object({
-  name: z.string().min(3).max(100),
-  email: z.string().min(3).max(100).email(),
-  username: z.string().min(3).max(100),
-  password: z.string().min(3).max(100),
-  profilePic: z.string().min(3).max(100),
-  about: z.string().max(200),
-  gender: z.enum(["MALE", "FEMALE", "PREFER_NOT_TO_SAY"]),
-  DOB: z.date(),
+  name: z.string().min(3).max(100).optional(),
+  email: z.string().min(3).max(100).email().optional(),
+  username: z.string().min(3).max(100).optional(),
+  password: z.string().min(3).max(100).optional(),
+  profilePic: z.string().min(3).max(100).optional(),
+  about: z.string().max(200).optional(),
+  gender: z.enum(["MALE", "FEMALE", "PREFER_NOT_TO_SAY"]).optional(),
+  DOB: z.coerce.date().optional(),
 });
 
 export const changePrivacySchema = z.object({

@@ -8,15 +8,19 @@ export const authMiddleware = async (
   res: Response,
   next: NextFunction
 ) => {
-  const token = req.headers.authorization?.split(" ")[1];
-  if (!token) {
-    res.status(403).json({
-      message: "Unauthorized",
-    });
-    return;
-  }
   try {
-    const decode = jwt.verify(token, JWT_SECRET);
+    const authHeader = req.headers["authorization"];
+    console.log("req.headers: ", authHeader);
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      console.log("auth header not found")
+      throw new Error("auth header not found");
+    }
+    const token = authHeader.split(" ")[1];
+    if (!token) {
+      console.log("tokne not found");
+      throw new Error("token not found");
+    }
+    const decode = jwt.verify(token!, JWT_SECRET);
     const userId = decode as string;
     const user = await db.user.findUnique({
       where: {
