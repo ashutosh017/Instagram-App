@@ -43,7 +43,6 @@ usersRouter.get("/search", async (req, res) => {
 usersRouter.get("/:userId/metadata", async (req, res) => {
   const userId = req.params.userId;
 
-  console.log("userID: ",userId);
   const limit = parseInt(req.query.limit as string, 10) || 10;
 
   const offset = parseInt(req.query.offset as string, 10) || 0;
@@ -86,7 +85,6 @@ usersRouter.get("/:userId/metadata", async (req, res) => {
   });
 
   if (!user) {
-    console.log("user not found");
     res.status(400).json({
       message: "user not found",
     });
@@ -99,10 +97,8 @@ usersRouter.get("/:userId/metadata", async (req, res) => {
 });
 
 usersRouter.post("/:userId/followers", async (req, res) => {
-  console.log("followers endpoint hit")
   const userId = req.params.userId;
   if (!userId) {
-    console.log("user id is required")
     res.status(200).json({
       message: "user id required",
     });
@@ -114,7 +110,6 @@ usersRouter.post("/:userId/followers", async (req, res) => {
     },
   });
   if (!user) {
-    console.log("user not found with the userid")
     res.status(400).json({
       message: "User not found",
     });
@@ -131,7 +126,6 @@ usersRouter.post("/:userId/followers", async (req, res) => {
       message: "You are successfully following: " + user.username,
     });
   } catch (e) {
-    console.log("you are already following the user")
     res.status(400).json({
       message: "you are already following the user",
     });
@@ -230,8 +224,6 @@ usersRouter.post("/:userId/message", async (req, res) => {
 usersRouter.put("/profile", async (req, res) => {
   const parsedSchema = editProfileSchema.safeParse(req.body);
   if (!parsedSchema.success) {
-    console.log("validation failed")
-    console.log("error: ",parsedSchema.error.errors)
     res.status(400).json({
       message: "error validating data",
       
@@ -387,7 +379,6 @@ usersRouter.get("/:userId/posts", async (req, res) => {
   const limit = parseInt(req.query.limit as string, 10) || 10;
   const offset = parseInt(req.query.offset as string, 10) || 0;
   if (!userId ) {
-    console.log("user not found /posts endpoint")
     res.status(400).json({
       message: "provide user id",
     });
@@ -418,7 +409,6 @@ usersRouter.get("/:userId/posts", async (req, res) => {
       })),
     });
   } catch (error) {
-    console.log("error fetching posts", error)
     res.status(400).json({
       message: "error fetching posts",
     });

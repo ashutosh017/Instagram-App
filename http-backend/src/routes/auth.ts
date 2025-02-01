@@ -36,7 +36,6 @@ authRouter.post("/signin", async (req, res) => {
     });
   }
   const token = jwt.sign(user.id, JWT_SECRET);
-  console.log("token: ",token)
   res.status(200).json({
     message: "signin success",
     token:token,
@@ -44,7 +43,6 @@ authRouter.post("/signin", async (req, res) => {
 });
 
 authRouter.post("/signup", async (req, res) => {
-  console.log("someone hit the signup endpoint");
   const parsedSchema = signupSchema.safeParse(req.body);
   if (!parsedSchema.success) {
     res.status(400).json({

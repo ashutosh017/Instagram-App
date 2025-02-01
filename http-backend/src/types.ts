@@ -57,7 +57,7 @@ export const commentsSchema = z.object({
 
 export const sharesSchema = z.object({
   postId: z.string().nonempty().max(1000),
-  recepientIds: z.array(z.string()).max(100).nonempty(),
+  recipientIds: z.array(z.string()).max(100).nonempty(),
 });
 
 export const uploadPostSchema = z.object({
@@ -66,7 +66,9 @@ export const uploadPostSchema = z.object({
   tags: z.array(z.string()).max(20).optional(),
 });
 
-export const postIdType = z.string().nonempty().max(100);
+export const postIdType = z.object({
+  postId:z.string().nonempty().max(100)
+})
 
 export const updatePostSchema = z.object({
   postId:z.string().nonempty().max(100),

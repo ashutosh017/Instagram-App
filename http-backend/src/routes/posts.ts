@@ -21,6 +21,22 @@ postsRouter.post("/liked-posts", async (req, res) => {
     return;
   }
   try {
+    const user = await db.user.findUnique({
+      where: {
+        id: req.userId,
+      },
+      select: {
+        likedPosts: true,
+      },
+    });
+
+    if (user?.likedPosts.includes(parsedSchema.data.postId)) {
+      res.status(400).json({
+        message: "you cannot a like same post twice",
+      });
+      return;
+    }
+
     await db.user.update({
       where: {
         id: req.userId,
@@ -66,7 +82,9 @@ postsRouter.get("/liked-posts", async (req, res) => {
       },
       select: {
         url: true,
-        comments: commentSelect(10),
+        comments: {
+          select: commentSelect(10),
+        },
         likes: true,
         dateCreated: true,
         description: true,
@@ -101,6 +119,21 @@ postsRouter.delete("/liked-posts", async (req, res) => {
         likedPosts: true,
       },
     });
+
+    if (!user) {
+      res.status(400).json({
+        message: "user not found",
+      });
+      return;
+    }
+
+    if (!user.likedPosts.includes(parsedSchema.data.postId)) {
+      res.status(400).json({
+        message: "you cannot dislike a same post twice",
+      });
+      return;
+    }
+
     const updatedList = user?.likedPosts.filter(
       (id) => id !== parsedSchema.data.postId
     );
@@ -134,18 +167,20 @@ postsRouter.post("/comments", async (req, res) => {
   }
   try {
     const { postId, comment } = parsedSchema.data;
-    await db.comment.create({
+    const resp = await db.comment.create({
       data: {
         text: comment,
-        dateAdded: Date.now().toString(),
+        dateAdded: new Date(),
         userId: req.userId,
         postId,
       },
     });
     res.status(200).json({
+      id:resp.id,
       message: "comment added successfully",
     });
   } catch (error) {
+    console.log(error)
     res.status(400).json({
       message: "error while adding comment",
     });
@@ -161,7 +196,7 @@ postsRouter.post("/shares", async (req, res) => {
     return;
   }
   try {
-    const { recepientIds, postId } = parsedSchema.data;
+    const { recipientIds, postId } = parsedSchema.data;
     const post = await db.post.findFirst({
       where: {
         id: postId,
@@ -175,7 +210,7 @@ postsRouter.post("/shares", async (req, res) => {
     }
 
     await Promise.all(
-      recepientIds.map(async (r) => {
+      recipientIds.map(async (r) => {
         const chat = await db.chat.upsert({
           where: {
             fromUserId_toUserId: {
@@ -221,7 +256,7 @@ postsRouter.post("/", async (req, res) => {
   }
   try {
     const { postUrl, description } = parsedSchema.data;
-    await db.post.create({
+    const resp = await db.post.create({
       data: {
         url: postUrl,
         description: description,
@@ -229,6 +264,7 @@ postsRouter.post("/", async (req, res) => {
       },
     });
     res.status(200).json({
+      id: resp.id,
       message: "post uploaded successfully",
     });
   } catch (error) {
@@ -239,14 +275,14 @@ postsRouter.post("/", async (req, res) => {
 });
 
 postsRouter.delete("/:postId", async (req, res) => {
-  const postIdCheck = postIdType.safeParse(req.body);
+  const postIdCheck = postIdType.safeParse(req.params);
   if (!postIdCheck.success) {
     res.status(400).json({
       message: "wrong postId type or post id is empty",
     });
     return;
   }
-  const postId = postIdCheck.data;
+  const postId = postIdCheck.data.postId;
   try {
     const post = await db.post.findFirst({
       where: {
@@ -282,7 +318,7 @@ postsRouter.post("/saved-posts", async (req, res) => {
     });
     return;
   }
-  const postId = postIdCheck.data;
+  const postId = postIdCheck.data.postId;
   const post = await db.post.findFirst({
     where: {
       id: postId,
@@ -340,6 +376,7 @@ postsRouter.get("/saved-posts", async (req, res) => {
 });
 
 postsRouter.delete("/saved-posts", async (req, res) => {
+  console.log("un save post endpoint hit");
   const postIdCheck = postIdType.safeParse(req.body);
   if (!postIdCheck.success) {
     res.status(400).json({
@@ -347,13 +384,14 @@ postsRouter.delete("/saved-posts", async (req, res) => {
     });
     return;
   }
-  const postId = postIdCheck.data;
+  const postId = postIdCheck.data.postId;
   const post = await db.post.findFirst({
     where: {
       id: postId,
     },
   });
   if (!post) {
+    console.log("postId: ", postId);
     res.status(400).json({
       message: "no post found with the post id",
     });
@@ -368,7 +406,9 @@ postsRouter.delete("/saved-posts", async (req, res) => {
     if (!user) {
       throw new Error("user not found");
     }
-    const filteredSavedPosts = user.savedPosts.filter((id:any) => id !== postId);
+    const filteredSavedPosts = user.savedPosts.filter(
+      (id: any) => id !== postId
+    );
     await db.user.update({
       where: {
         id: req.userId,
@@ -380,7 +420,7 @@ postsRouter.delete("/saved-posts", async (req, res) => {
       },
     });
     res.status(200).json({
-      message: "post un saved successfully",
+      message: "post unsaved successfully",
     });
   } catch (error) {
     res.status(400).json({
@@ -391,14 +431,14 @@ postsRouter.delete("/saved-posts", async (req, res) => {
 });
 
 postsRouter.get("/:postId", async (req, res) => {
-  const postIdCheck = postIdType.safeParse(req.body);
+  const postIdCheck = postIdType.safeParse(req.params);
   if (!postIdCheck.success) {
     res.status(400).json({
       message: "wrong postId type or post id is empty",
     });
     return;
   }
-  const postId = postIdCheck.data;
+  const postId = postIdCheck.data.postId;
   const post = await db.post.findFirst({
     where: {
       id: postId,
@@ -433,7 +473,7 @@ postsRouter.put("/", async (req, res) => {
     });
     return;
   }
-  const {postId,description, tags} = parsedSchema.data;
+  const { postId, description, tags } = parsedSchema.data;
 
   const post = await db.post.findFirst({
     where: {
@@ -446,43 +486,28 @@ postsRouter.put("/", async (req, res) => {
     });
     return;
   }
-  type UpdateData={
-    description:string,
-    tags:string[] 
-  }|{
-    description:string
-  }|{
-    tags:string[]
-  }|{}
-  let updateData:UpdateData ={}
-  if(tags && description ){
-    updateData = {
-        description,
-        tags
-    }
-  }
-  if(tags && !description){
-    updateData:{
-        tags
-    }
-  }
-  if(description && !tags){
-    updateData:{
-        description
-    }
+  const creatorId = post.userId;
+  if(creatorId!==req.userId){
+    res.status(403).json({
+      message:"Unauthorized"
+    })
+    return;
   }
   try {
     await db.post.update({
-        where:{
-            id:postId
-        },data:updateData
-    })
+      where: {
+        id: postId,
+      },
+      data: {
+        description,
+      },
+    });
     res.status(200).json({
-        message:"post updated successfully"
-    })
+      message: "post updated successfully",
+    });
   } catch (error) {
     res.status(400).json({
-        message:"error while updating post"
-    })
+      message: "error while updating post",
+    });
   }
 });

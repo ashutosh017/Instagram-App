@@ -163,8 +163,8 @@ describe("/users endpoint", () => {
     anotherUserId = resp3.data.userId;
 
     const resp4 = await axios.post(`${BACKEND_URL}/api/v1/signin`, {
-      username:username2,
-      password:password2,
+      username: username2,
+      password: password2,
     });
     anotherUserToken = resp4.data.token;
     console.log("another user id: ", anotherUserId);
@@ -314,12 +314,12 @@ describe("/users endpoint", () => {
       {
         name: "new name",
         email: `email${Math.random()}@gmail.com`,
-        username: "newusername69"+Math.random(),
+        username: "newusername69" + Math.random(),
         password: "password2",
         profilePic: "newprofilepic.com",
         about: "nothing in about",
         gender: "MALE",
-        DOB: 29/11/2004,
+        DOB: 29 / 11 / 2004,
       },
       {
         headers: {
@@ -327,10 +327,10 @@ describe("/users endpoint", () => {
         },
       }
     );
-    expect(res.status).toBe(200)
+    expect(res.status).toBe(200);
   });
 
-  test("another user cannot be able to modify other user's profile",async()=>{
+  test("another user cannot be able to modify other user's profile", async () => {
     const res = await axios.put(
       `${BACKEND_URL}/api/v1/users/profile`,
       {
@@ -341,7 +341,7 @@ describe("/users endpoint", () => {
         profilePic: "newprofilepic.com",
         about: "nothing in about",
         gender: "MALE",
-        DOB: 29/11/2004,
+        DOB: 29 / 11 / 2004,
       },
       {
         headers: {
@@ -349,59 +349,490 @@ describe("/users endpoint", () => {
         },
       }
     );
-    expect(res.status).toBe(400)    
-  })
+    expect(res.status).toBe(400);
+  });
 
-  test("user is able to change the password",async()=>{
-    const res = await axios.post(`${BACKEND_URL}/api/v1/users/password`,{
-      newPassword:"newPassword"
-    },{
-      headers:{
-        authorization:`Bearer ${token}`
+  test("user is able to change the password", async () => {
+    const res = await axios.post(
+      `${BACKEND_URL}/api/v1/users/password`,
+      {
+        newPassword: "newPassword",
+      },
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
       }
-    })
+    );
 
-    expect(res.status).toBe(200)
-  })
+    expect(res.status).toBe(200);
+  });
 
-  test("get followers",async()=>{
-    const res = await axios.get(`${BACKEND_URL}/api/v1/users/followers`,{
-      headers:{
-        authorization:`Bearer ${token}`
-      }
-    })
-    expect(res.status).toBe(200)
-  })
+  test("get followers", async () => {
+    const res = await axios.get(`${BACKEND_URL}/api/v1/users/followers`, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    });
+    expect(res.status).toBe(200);
+  });
 
-  test("get following",async()=>{
-    const res = await axios.get(`${BACKEND_URL}/api/v1/users/following`,{
-      headers:{
-        authorization:`Bearer ${token}`
-      }
-    })
-    expect(res.status).toBe(200)
-  })
-  
-  test("get posts",async()=>{
-    console.log("another user id: ",anotherUserId)
-    const res = await axios.get(`${BACKEND_URL}/api/v1/users/${anotherUserId}/posts?limit=10&offset=0`,{
-      headers:{
-        authorization:`Bearer ${token}`
-      }
-    })
-    expect(res.status).toBe(200)
-  })
+  test("get following", async () => {
+    const res = await axios.get(`${BACKEND_URL}/api/v1/users/following`, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    });
+    expect(res.status).toBe(200);
+  });
 
-  test("get feed",async()=>{
-    const res = await axios.get(`${BACKEND_URL}/api/v1/users/feed`,{
-      headers:{
-        authorization:`Bearer ${token}`
+  test("get posts", async () => {
+    console.log("another user id: ", anotherUserId);
+    const res = await axios.get(
+      `${BACKEND_URL}/api/v1/users/${anotherUserId}/posts?limit=10&offset=0`,
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
       }
-    })
-    expect(res.status).toBe(200)
-  })
+    );
+    expect(res.status).toBe(200);
+  });
+
+  test("get feed", async () => {
+    const res = await axios.get(`${BACKEND_URL}/api/v1/users/feed`, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    });
+    expect(res.status).toBe(200);
+  });
 });
 
-describe("/posts endpoint",()=>{
+describe("/posts endpoint", () => {
+  let postId;
+  let userId;
+  let anotherUserId;
+  let anotherUserToken;
+  let token;
+  const username = "name" + Math.random();
+  const password = "password";
+  const name = "name";
+  const email = username + "@email.com";
+  const profilePic = "https://profile-pic-url.com";
+
+  const username2 = "name" + Math.random();
+  const password2 = "password";
+  const name2 = "name";
+  const email2 = username2 + "@email.com";
+  const profilePic2 = "https://profile-pic-url.com";
+
+  beforeAll(async () => {
+    const resp = await axios.post(`${BACKEND_URL}/api/v1/signup`, {
+      name,
+      username,
+      password,
+      email,
+      profilePic,
+    });
+    userId = resp.data.userId;
+    const res2 = await axios.post(`${BACKEND_URL}/api/v1/signin`, {
+      username,
+      password,
+    });
+    token = res2.data.token;
+    const resp3 = await axios.post(`${BACKEND_URL}/api/v1/signup`, {
+      name: name2,
+      username: username2,
+      password: password2,
+      email: email2,
+      profilePic: profilePic2,
+    });
+
+    anotherUserId = resp3.data.userId;
+
+    const resp4 = await axios.post(`${BACKEND_URL}/api/v1/signin`, {
+      username: username2,
+      password: password2,
+    });
+    anotherUserToken = resp4.data.token;
+  });
+
+  test("create or upload a post", async () => {
+    const res = await axios.post(
+      `${BACKEND_URL}/api/v1/posts/`,
+      {
+        postUrl: "posturl.com",
+        description: "post description",
+        tags: ["tag1", "tag2"],
+      },
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    expect(res.status).toBe(200);
+    postId = res.data.id;
+  });
+
+  test("like a post", async () => {
+    const res = await axios.post(
+      `${BACKEND_URL}/api/v1/posts/liked-posts`,
+      {
+        postId,
+      },
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    expect(res.status).toBe(200);
+  });
+
+  test("user is not able to like same post twice", async () => {
+    const res2 = await axios.post(
+      `${BACKEND_URL}/api/v1/posts/liked-posts`,
+      {
+        postId,
+      },
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    expect(res2.status).toBe(400);
+  });
+
+  test("Individual can see their liked posts", async () => {
+    const res = await axios.get(`${BACKEND_URL}/api/v1/posts/liked-posts`, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    });
+    expect(res.status).toBe(200);
+  });
+
+  test("dislike a post ", async () => {
+    console.log("post id: ", postId);
+    const res = await axios.delete(`${BACKEND_URL}/api/v1/posts/liked-posts`, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+      data: { postId },
+    });
+    expect(res.status).toBe(200);
+  });
+  test("cannot dislike a post twice ", async () => {
+    const res2 = await axios.delete(`${BACKEND_URL}/api/v1/posts/liked-posts`, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+      data: { postId },
+    });
+    expect(res2.status).toBe(400);
+  });
+
+  test("comment on a post", async () => {
+    const res = await axios.post(
+      `${BACKEND_URL}/api/v1/posts/comments`,
+      {
+        postId,
+        comment: "your mean comment",
+      },
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    expect(res.data.id).toBeDefined();
+    expect(res.status).toBe(200);
+  });
+
+  test("user cannot comment on a post that does not exist", async () => {
+    const res = await axios.post(
+      `${BACKEND_URL}/api/v1/posts/comments`,
+      {
+        postId: "lsdjkfjklsdf",
+        comment: "your mean comment",
+      },
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    expect(res.status).toBe(400);
+  });
+
+  test("share a post", async () => {
+    const res = await axios.post(
+      `${BACKEND_URL}/api/v1/posts/shares`,
+      {
+        postId,
+        recipientIds: [anotherUserId],
+      },
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    expect(res.status).toBe(200);
+  });
+
+  test("delete a post", async () => {
+    const createPostRes = await axios.post(
+      `${BACKEND_URL}/api/v1/posts`,
+      {
+        postUrl: "posturl.com",
+        description: "damn description",
+        tags: ["tag1", "tag2"],
+      },
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    const postIdToDelete = createPostRes.data.id;
+    console.log("postIdToDelete: ", postIdToDelete);
+    const deletePostRes = await axios.delete(
+      `${BACKEND_URL}/api/v1/posts/${postIdToDelete}`,
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log(deletePostRes.data.message);
+    expect(deletePostRes.status).toBe(200);
+    const deletePostRes2 = await axios.delete(
+      `${BACKEND_URL}/api/v1/posts/${postIdToDelete}`,
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    expect(deletePostRes2.status).toBe(400);
+  });
+
+  test("save a post", async () => {
+    const res = await axios.post(
+      `${BACKEND_URL}/api/v1/posts/saved-posts`,
+      {
+        postId: postId,
+      },
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    expect(res.status).toBe(200);
+  });
+
+  test("get all saved posts", async () => {
+    const res = await axios.get(`${BACKEND_URL}/api/v1/posts/saved-posts`, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    });
+    expect(res.data.posts).toBeDefined();
+    expect(res.status).toBe(200);
+  });
+
+  // TODO: come back here
+  test("un save a post", async () => {
+    const res = await axios.delete(`${BACKEND_URL}/api/v1/posts/saved-posts`, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+      data: { postId }, // ✅ Moved inside config
+    });
+    console.log(postId);
+    console.log(res.data.message);
+    expect(res.status).toBe(200);
+  });
+
+  test("get post metadata", async () => {
+    const res = await axios.get(`${BACKEND_URL}/api/v1/posts/${postId}`, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    });
+    expect(res.status).toBe(200);
+  });
+
+  test("update post", async () => {
+    const createNewPostRes = await axios.post(
+      `${BACKEND_URL}/api/v1/posts`,
+      {
+        /*
+        postUrl: z.string().nonempty(),
+  description: z.string().max(500).optional(),
+  tags: z.array(z.string()).max(20).optional(),
+       */
+        postUrl: "postUrl.com",
+        description: "klsdjfljk ",
+        tags: ["tag1"],
+      },
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    const newPostId = createNewPostRes.data.id;
+    const updatePostRes = await axios.put(
+      `${BACKEND_URL}/api/v1/posts`,
+      {
+        postId: newPostId,
+        postUrl: "newposturl.com",
+        description: "new desc",
+        tags: ["new tag"],
+      },
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log("updatePostRes.data.message: ", updatePostRes.data.message);
+    expect(updatePostRes.status).toBe(200);
+  });
+
+  test("other user cannot be able to update post of another person", async () => {
+    const createNewPostRes = await axios.post(
+      `${BACKEND_URL}/api/v1/posts`,
+      {
+        postUrl: "postUrl.com",
+        description: "klsdjfljk ",
+        tags: ["tag1"],
+      },
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    const newPostId = createNewPostRes.data.id;
+    const updatePostRes = await axios.put(
+      `${BACKEND_URL}/api/v1/posts`,
+      {
+        postId: newPostId,
+        postUrl: "newposturl.com",
+        description: "new desc",
+        tags: ["new tag"],
+      },
+      {
+        headers: {
+          authorization: `Bearer ${anotherUserToken}`,
+        },
+      }
+    );
+    console.log("updatePostRes.data.message: ", updatePostRes.data.message);
+    expect(updatePostRes.status).toBe(403);
+  });
+});
+
+describe("/comments route", () => {
+  let postId;
+  let userId;
+  let anotherUserId;
+  let anotherUserToken;
+  let token;
+  const username = "name" + Math.random();
+  const password = "password";
+  const name = "name";
+  const email = username + "@email.com";
+  const profilePic = "https://profile-pic-url.com";
+
+  const username2 = "name" + Math.random();
+  const password2 = "password";
+  const name2 = "name";
+  const email2 = username2 + "@email.com";
+  const profilePic2 = "https://profile-pic-url.com";
+  beforeAll(async () => {
+    const resp = await axios.post(`${BACKEND_URL}/api/v1/signup`, {
+      name,
+      username,
+      password,
+      email,
+      profilePic,
+    });
+    userId = resp.data.userId;
+    const res2 = await axios.post(`${BACKEND_URL}/api/v1/signin`, {
+      username,
+      password,
+    });
+    token = res2.data.token;
+    const resp3 = await axios.post(`${BACKEND_URL}/api/v1/signup`, {
+      name: name2,
+      username: username2,
+      password: password2,
+      email: email2,
+      profilePic: profilePic2,
+    });
+
+    anotherUserId = resp3.data.userId;
+
+    const resp4 = await axios.post(`${BACKEND_URL}/api/v1/signin`, {
+      username: username2,
+      password: password2,
+    });
+    anotherUserToken = resp4.data.token;
+
+    const createPostRes = await axios.post(
+      `${BACKEND_URL}/api/v1/posts/`,
+      {
+        postUrl: "posturl.com",
+        description: "post description",
+        tags: ["tag1", "tag2"],
+      },
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    postId = createPostRes.data.id;
+    const commentPostRes = await axios.post(
+      `${BACKEND_URL}/api/v1/posts/comments`,
+      {
+        postId,
+        comment: "your mean comment",
+      },
+      {
+        headers: {
+          authorization: `Bearer ${anotherUserToken}`,
+        },
+      }
+    );
+    commentId = commentPostRes.data.id
+  });
+  test("reply to a comment", async () => {
+    console.log(commentId)
+    console.log(postId)
+    const res = await axios.post(
+      `${BACKEND_URL}/api/v1/comments/replies`,
+      {
+        commentId,
+        postId,
+        reply: "your reply",
+      },
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log(res.data.message)
+    expect(res.status).toBe(200)
+  });
   
-})
+});

@@ -9,15 +9,12 @@ export const authMiddleware = async (
   next: NextFunction
 ) => {
   try {
-    const authHeader = req.headers["authorization"];
-    console.log("req.headers: ", authHeader);
+    const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      console.log("auth header not found")
       throw new Error("auth header not found");
     }
     const token = authHeader.split(" ")[1];
     if (!token) {
-      console.log("tokne not found");
       throw new Error("token not found");
     }
     const decode = jwt.verify(token!, JWT_SECRET);

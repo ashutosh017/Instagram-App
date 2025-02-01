@@ -4,7 +4,7 @@ import { replyToCommentSchema } from "../types";
 
 export const commentsRouter = express.Router();
 
-commentsRouter.get("/replies", async (req, res) => {
+commentsRouter.post("/replies", async (req, res) => {
   const parsedSchema = replyToCommentSchema.safeParse(req.body);
   if (!parsedSchema.success) {
     res.status(400).json({
@@ -29,6 +29,7 @@ commentsRouter.get("/replies", async (req, res) => {
       data: {
         replies: {
           create: comment,
+
         },
       },
     });
@@ -36,6 +37,7 @@ commentsRouter.get("/replies", async (req, res) => {
       message: "reply added successfully",
     });
   } catch (error) {
+    console.error(error)
     res.status(400).json({
       message:
         "error while adding reply or comment not found with the provided comment id",
