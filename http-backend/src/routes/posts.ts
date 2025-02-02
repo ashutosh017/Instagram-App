@@ -167,6 +167,11 @@ postsRouter.post("/comments", async (req, res) => {
   }
   try {
     const { postId, comment } = parsedSchema.data;
+    const post = await db.post.findFirst({
+      where:{
+        id:postId
+      }
+    })
     const resp = await db.comment.create({
       data: {
         text: comment,
@@ -175,6 +180,7 @@ postsRouter.post("/comments", async (req, res) => {
         postId,
       },
     });
+    console.log("resp id: ",resp.id)
     res.status(200).json({
       id:resp.id,
       message: "comment added successfully",
@@ -377,8 +383,9 @@ postsRouter.get("/saved-posts", async (req, res) => {
 
 postsRouter.delete("/saved-posts", async (req, res) => {
   console.log("un save post endpoint hit");
-  const postIdCheck = postIdType.safeParse(req.body);
+  const postIdCheck = postIdType.safeParse(req.query);
   if (!postIdCheck.success) {
+    console.log("parsing failed",postIdCheck.error.errors)
     res.status(400).json({
       message: "wrong postId type or post id is empty",
     });
@@ -423,6 +430,7 @@ postsRouter.delete("/saved-posts", async (req, res) => {
       message: "post unsaved successfully",
     });
   } catch (error) {
+    console.log(error)
     res.status(400).json({
       message: "error while saving the post",
       error,

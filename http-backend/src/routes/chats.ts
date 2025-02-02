@@ -19,6 +19,27 @@ chatsRouter.get("/:chatId/messages", async(req,res)=>{
            res.status(404).json({ message: "No messages found for this chat." });
            return;
         }
+        const chat1 = await db.chat.findFirst({
+          where:{
+            id:chatId
+          }
+        })
+        if(!chat1){
+          res.status(400).json({
+            message:"no chat found with the chat id"
+          })
+          return;
+        }
+
+        if(chat1.fromUserId!==req.userId && chat1.toUserId!==req.userId){
+          console.log("fromUserId: ",chat1.fromUserId)
+          console.log("toUserId: ",chat1.toUserId)
+          console.log("userId: ",req.userId)
+          res.status(403).json({
+            message:"unauthorized"
+          })
+          return;
+        }
     
         const messages = await db.message.findMany({
           where: { chatId },
@@ -57,7 +78,7 @@ chatsRouter.get("/:chatId/messages", async(req,res)=>{
       }
 })
 
-chatsRouter.get("/chats", async (req, res) => {
+chatsRouter.get("/", async (req, res) => {
     try {
         const page = parseInt(req.query.page as string) || 1;
         const limit = parseInt(req.query.limit as string) || 10;
@@ -72,21 +93,36 @@ chatsRouter.get("/chats", async (req, res) => {
         }
     
         const chats = await db.chat.findMany({
+          where:{
+            OR:[
+              {
+                fromUserId:req.userId
+              },
+              {
+                toUserId:req.userId
+              }
+            ]
+          },
           skip: offset,
           take: limit,
           orderBy: { id: "asc" }, 
-          include: {
-            messages: {
-              take: 1,
-              orderBy: { dateSend: "desc" }, 
-            },
+          select:{
+            id:true
+            ,fromUserId:true,
+            toUserId:true,
+            messages:{
+              take:1,
+              orderBy:{
+                dateSend:"desc"
+              }
+            }
           },
         });
     
         const formattedChats = chats.map((chat:any) => {
           const lastMessage = chat.messages[0] || null;
-    
           return {
+            id:chat.id,
             fromUserId: chat.fromUserId,
             lastMessage: lastMessage?.content || null,
             read: lastMessage ? lastMessage.status === "SEEN" : true,

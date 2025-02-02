@@ -187,7 +187,7 @@ usersRouter.post("/:userId/message", async (req, res) => {
     return;
   }
   try {
-    await db.$transaction(async () => {
+    const chatId = await db.$transaction(async () => {
       const chat = await db.chat.upsert({
         where: {
           fromUserId_toUserId: {
@@ -202,7 +202,7 @@ usersRouter.post("/:userId/message", async (req, res) => {
         },
       });
 
-      await db.message.create({
+      const msg = await db.message.create({
         data: {
           content: message,
           fromUserId: req.userId,
@@ -210,8 +210,10 @@ usersRouter.post("/:userId/message", async (req, res) => {
           chatId: chat.id,
         },
       });
+      return msg.chatId
     });
     res.status(200).json({
+      chatId:chatId,
       message: "message sent successfully",
     });
   } catch (error) {

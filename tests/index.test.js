@@ -648,11 +648,10 @@ describe("/posts endpoint", () => {
 
   // TODO: come back here
   test("un save a post", async () => {
-    const res = await axios.delete(`${BACKEND_URL}/api/v1/posts/saved-posts`, {
+    const res = await axios.delete(`${BACKEND_URL}/api/v1/posts/saved-posts?postId=${postId}`, {
       headers: {
         authorization: `Bearer ${token}`,
       },
-      data: { postId }, // ✅ Moved inside config
     });
     console.log(postId);
     console.log(res.data.message);
@@ -672,11 +671,6 @@ describe("/posts endpoint", () => {
     const createNewPostRes = await axios.post(
       `${BACKEND_URL}/api/v1/posts`,
       {
-        /*
-        postUrl: z.string().nonempty(),
-  description: z.string().max(500).optional(),
-  tags: z.array(z.string()).max(20).optional(),
-       */
         postUrl: "postUrl.com",
         description: "klsdjfljk ",
         tags: ["tag1"],
@@ -740,7 +734,7 @@ describe("/posts endpoint", () => {
   });
 });
 
-describe("/comments route", () => {
+describe("other routes", () => {
   let postId;
   let userId;
   let anotherUserId;
@@ -813,11 +807,11 @@ describe("/comments route", () => {
         },
       }
     );
-    commentId = commentPostRes.data.id
+    commentId = commentPostRes.data.id;
   });
   test("reply to a comment", async () => {
-    console.log(commentId)
-    console.log(postId)
+    console.log(commentId);
+    console.log(postId);
     const res = await axios.post(
       `${BACKEND_URL}/api/v1/comments/replies`,
       {
@@ -831,8 +825,116 @@ describe("/comments route", () => {
         },
       }
     );
-    console.log(res.data.message)
-    expect(res.status).toBe(200)
+    console.log(res.data.message);
+    expect(res.status).toBe(200);
   });
-  
+
+  test("get all notfications", async () => {
+    const res = await axios.get(
+      `${BACKEND_URL}/api/v1/notifications?page=1&limit=10`,
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    expect(res.status).toBe(200);
+  });
+
+  test("user can see all their chats", async () => {
+    const res = await axios.get(`${BACKEND_URL}/api/v1/chats/`, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    });
+    if (res.data.chats.length > 0) {
+      console.log(res.data.chats.length);
+      console.log(res.data)
+      expect(res.data.chats[0].id).toBeDefined();
+    }
+    expect(res.status).toBe(200);
+  });
+
+
+
+  test("get all messages of a perticular chat", async () => {
+    const username = "name" + Math.random();
+    const password = "password";
+    const name = "name";
+    const email = username + "@email.com";
+    const profilePic = "https://profile-pic-url.com";
+    const authorizedPersonSignup = await axios.post(`${BACKEND_URL}/api/v1/signup`, {
+      name,
+      username,
+      password,
+      email,
+      profilePic,
+    });
+    
+    const authorizedPersonSignin= await axios.post(`${BACKEND_URL}/api/v1/signin`, {
+      username,
+      password,
+    });
+    const authorizedPersonsToken= authorizedPersonSignin.data.token;
+    
+    await axios.post(`${BACKEND_URL}/api/v1/users/${userId}/message`,{
+      message:"hello "
+    },{
+      headers:{
+        authorization:`Bearer ${authorizedPersonsToken}`
+      }
+    })
+    const res = await axios.get(`${BACKEND_URL}/api/v1/chats/`, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    });
+    const chatId = res.data.chats[0].id;
+    const res2 = await axios.get(
+      `${BACKEND_URL}/api/v1/chats/${chatId}/messages`,
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    expect(res2.status).toBe(200);
+  });
+
+  test("unauthorized person cannot see messages of other chats",async()=>{
+    const username = "name" + Math.random();
+    const password = "password";
+    const name = "name";
+    const email = username + "@email.com";
+    const profilePic = "https://profile-pic-url.com";
+    const unauthorizedPersonSignup = await axios.post(`${BACKEND_URL}/api/v1/signup`, {
+      name,
+      username,
+      password,
+      email,
+      profilePic,
+    });
+    
+    const unauthorizedPersonSignin= await axios.post(`${BACKEND_URL}/api/v1/signin`, {
+      username,
+      password,
+    });
+    const unauthorizedPersonsToken= unauthorizedPersonSignin.data.token;
+    
+    const res = await axios.get(`${BACKEND_URL}/api/v1/chats/`, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    });
+    const chatId = res.data.chats[0].id;
+    const res2 = await axios.get(
+      `${BACKEND_URL}/api/v1/chats/${chatId}/messages`,
+      {
+        headers: {
+          authorization: `Bearer ${unauthorizedPersonsToken}`,
+        },
+      }
+    );
+    expect(res2.status).toBe(403);
+  })
 });

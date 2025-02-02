@@ -13,27 +13,20 @@ commentsRouter.post("/replies", async (req, res) => {
     return;
   }
   const { commentId, reply, postId } = parsedSchema.data;
-  const comment = await db.comment.create({
-    data: {
-      text: reply,
-      postId,
-      userId: req.userId,
-      dateAdded: new Date(),
-    },
-  });
+ 
   try {
-    await db.comment.update({
-      where: {
-        id: commentId,
-      },
+    const replyRes = await db.comment.create({
       data: {
-        replies: {
-          create: comment,
-
-        },
+        text: reply,
+        postId,
+        userId: req.userId,
+        dateAdded: new Date(),
+        parentId:commentId
+  
       },
     });
     res.status(200).json({
+      replyId:replyRes.id,
       message: "reply added successfully",
     });
   } catch (error) {
