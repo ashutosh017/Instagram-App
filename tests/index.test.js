@@ -648,7 +648,23 @@ describe("/posts endpoint", () => {
 
   // TODO: come back here
   test("un save a post", async () => {
-    const res = await axios.delete(`${BACKEND_URL}/api/v1/posts/saved-posts?postId=${postId}`, {
+    let PostId
+    const res1 = await axios.post(
+      `${BACKEND_URL}/api/v1/posts/`,
+      {
+        postUrl: "posturl.com",
+        description: "post description",
+        tags: ["tag1", "tag2"],
+      },
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    PostId = res1.data.id;
+    console.log(PostId)
+    const res = await axios.delete(`${BACKEND_URL}/api/v1/posts/saved-posts?postId=${PostId}`, {
       headers: {
         authorization: `Bearer ${token}`,
       },
