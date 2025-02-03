@@ -80,7 +80,7 @@ describe("Authentication", () => {
     const res = await axios.post(`${BACKEND_URL}/api/v1/signup`, {
       username,
       password,
-      name,
+      name,                                                       
       email,
     });
     expect(res.status).toBe(400);
