@@ -280,8 +280,9 @@ postsRouter.post("/", async (req, res) => {
   }
 });
 
-postsRouter.delete("/:postId", async (req, res) => {
-  const postIdCheck = postIdType.safeParse(req.params);
+postsRouter.delete("/", async (req, res) => {
+  console.log("merko kyu hit kr rhe ho")
+  const postIdCheck = postIdType.safeParse(req.query);
   if (!postIdCheck.success) {
     res.status(400).json({
       message: "wrong postId type or post id is empty",

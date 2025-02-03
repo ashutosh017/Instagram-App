@@ -601,7 +601,7 @@ describe("/posts endpoint", () => {
     const postIdToDelete = createPostRes.data.id;
     console.log("postIdToDelete: ", postIdToDelete);
     const deletePostRes = await axios.delete(
-      `${BACKEND_URL}/api/v1/posts/${postIdToDelete}`,
+      `${BACKEND_URL}/api/v1/posts/?postId=${postIdToDelete}`,
       {
         headers: {
           authorization: `Bearer ${token}`,
@@ -611,7 +611,7 @@ describe("/posts endpoint", () => {
     console.log(deletePostRes.data.message);
     expect(deletePostRes.status).toBe(200);
     const deletePostRes2 = await axios.delete(
-      `${BACKEND_URL}/api/v1/posts/${postIdToDelete}`,
+      `${BACKEND_URL}/api/v1/posts/?postId=${postIdToDelete}`,
       {
         headers: {
           authorization: `Bearer ${token}`,
