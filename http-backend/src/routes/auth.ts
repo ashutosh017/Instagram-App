@@ -1,6 +1,6 @@
 import express from "express";
 // import db from "@db/src";
-import db from "../db/src";
+import db from "../../../db/src";
 import { signinSchema, signupSchema } from "../types";
 import { JWT_SECRET } from "../config";
 import bcrypt from "bcrypt";

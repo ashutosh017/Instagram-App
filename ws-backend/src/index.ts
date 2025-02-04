@@ -16,7 +16,7 @@ wss.on("connection", (socket, request) => {
   const user = extractUser(socket, token);
   App.addUser(user);
 
-  socket.on("message", (data) => {
+  socket.on("message", (data:any) => {
     console.log(data.toString());
   });
   socket.on("close",()=>{

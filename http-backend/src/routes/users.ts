@@ -1,6 +1,7 @@
 import express from "express";
-export const usersRouter = express.Router();
-import db from "../db/src";
+import {Router} from 'express'
+export const usersRouter:Router = Router();
+import db from "../../../db/src";
 import {
   changePasswordSchema,
   changePrivacySchema,
@@ -9,8 +10,6 @@ import {
 } from "../types";
 import bcrypt from "bcrypt";
 import { commentSelect } from "../config";
-
-
 
 usersRouter.get("/search", async (req, res) => {
   const name = req.query.name;
@@ -32,7 +31,7 @@ usersRouter.get("/search", async (req, res) => {
   });
 
   res.status(200).json({
-    users: users.map((u) => ({
+    users: users.map((u:any) => ({
       name: u.name,
       username: u.username,
       profilePic: u.profilePic,
@@ -331,7 +330,7 @@ usersRouter.get("/followers", async (req, res) => {
       },
     });
     res.status(200).json({
-      followers: followers.map((f) => ({
+      followers: followers.map((f:any) => ({
         name: f.follower.name,
         username: f.follower.username,
         profilePic: f.follower.profilePic,
@@ -362,7 +361,7 @@ usersRouter.get("/following", async (req, res) => {
       },
     });
     res.status(200).json({
-      followers: following.map((f) => ({
+      followers: following.map((f:any) => ({
         name: f.user.name,
         username: f.user.username,
         profilePic: f.user.profilePic,
@@ -400,11 +399,11 @@ usersRouter.get("/:userId/posts", async (req, res) => {
       },
     });
     res.status(200).json({
-      posts: posts.map((p) => ({
+      posts: posts.map((p:any) => ({
         postId: p.id,
         postUrl: p.url,
         likes: p.likes,
-        comments: p.comments.map((c) => ({
+        comments: p.comments.map((c:any) => ({
           comment: c.text,
           likes: c.likes,
         })),
@@ -449,11 +448,11 @@ usersRouter.get("/feed", async (req, res) => {
       },
     });
     res.status(200).json({
-      feed: feed.map((f) => ({
-        post: f.user.posts.map((p) => ({
+      feed: feed.map((f:any) => ({
+        post: f.user.posts.map((p:any) => ({
           postUrl: p.url,
           dateCreated: p.dateCreated,
-          comments: p.comments.map((c) => ({
+          comments: p.comments.map((c:any) => ({
             comment: c.text,
             dateAdded: c.dateAdded,
             likes: c.likes,

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { JWT_SECRET } from "../config";
-import db from "../db/src";
+import db from "../../../db/src";
 
 export const authMiddleware = async (
   req: Request,

@@ -12,6 +12,7 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@types/node": "^22.13.1",
     "prisma": "6.2.1"
   },
   "dependencies": {

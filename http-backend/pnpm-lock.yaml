@@ -8,12 +8,12 @@ importers:
 
   .:
     dependencies:
-      '@prisma/client':
-        specifier: 6.2.1
-        version: 6.2.1(prisma@6.2.1)
       bcrypt:
         specifier: ^5.1.1
         version: 5.1.1
+      db:
+        specifier: link:../db
+        version: link:../db
       express:
         specifier: ^4.21.2
         version: 4.21.2
@@ -42,15 +42,6 @@ packages:
   '@mapbox/node-pre-gyp@1.0.11':
     resolution: {integrity: sha512-Yhlar6v9WQgUp/He7BdgzOz8lqMQ8sU+jkCq7Wx8Myc5YFJLbEe7lgui/V7G1qB1DJykHSGwreceSaD60Y0PUQ==}
     hasBin: true
-
-  '@prisma/client@6.2.1':
-    resolution: {integrity: sha512-msKY2iRLISN8t5X0Tj7hU0UWet1u0KuxSPHWuf3IRkB4J95mCvGpyQBfQ6ufcmvKNOMQSq90O2iUmJEN2e5fiA==}
-    engines: {node: '>=18.18'}
-    peerDependencies:
-      prisma: '*'
-    peerDependenciesMeta:
-      prisma:
-        optional: true
 
   '@prisma/debug@6.2.1':
     resolution: {integrity: sha512-0KItvt39CmQxWkEw6oW+RQMD6RZ43SJWgEUnzxN8VC9ixMysa7MzZCZf22LCK5DSooiLNf8vM3LHZm/I/Ni7bQ==}
@@ -652,10 +643,6 @@ snapshots:
     transitivePeerDependencies:
       - encoding
       - supports-color
-
-  '@prisma/client@6.2.1(prisma@6.2.1)':
-    optionalDependencies:
-      prisma: 6.2.1
 
   '@prisma/debug@6.2.1': {}
 

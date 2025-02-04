@@ -7,7 +7,7 @@ import {
   updatePostSchema,
   uploadPostSchema,
 } from "../types";
-import db from "../db/src";
+import db from "../../../db/src";
 import { commentSelect } from "../config";
 
 export const postsRouter = express.Router();
@@ -135,7 +135,7 @@ postsRouter.delete("/liked-posts", async (req, res) => {
     }
 
     const updatedList = user?.likedPosts.filter(
-      (id) => id !== parsedSchema.data.postId
+      (id:any) => id !== parsedSchema.data.postId
     );
     await db.user.update({
       where: {
@@ -370,7 +370,7 @@ postsRouter.get("/saved-posts", async (req, res) => {
       },
     });
     res.status(200).json({
-      posts: posts.map((p) => ({
+      posts: posts.map((p:any) => ({
         postId: p.id,
         postUrl: p.url,
       })),

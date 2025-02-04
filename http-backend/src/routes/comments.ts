@@ -1,5 +1,5 @@
 import express from "express";
-import db from "../db/src";
+import db from "../../../db/src";
 import { replyToCommentSchema } from "../types";
 
 export const commentsRouter = express.Router();
