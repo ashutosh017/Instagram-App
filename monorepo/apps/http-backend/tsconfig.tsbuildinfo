@@ -1,0 +1,1 @@
+{"root":["./src/config.ts","./src/index.ts","./src/types.ts","./src/middlewares/authmiddleware.ts","./src/routes/auth.ts","./src/routes/chats.ts","./src/routes/comments.ts","./src/routes/notifications.ts","./src/routes/posts.ts","./src/routes/users.ts"],"version":"5.7.3"}

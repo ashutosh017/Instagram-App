@@ -954,3 +954,7 @@ describe("other routes", () => {
     expect(res2.status).toBe(403);
   })
 });
+
+describe("Websockets tests",()=>{
+  
+})
