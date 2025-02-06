@@ -15,7 +15,7 @@ export class AppManager {
     user.socket.send(message);
   }
   getUser(userId: string) {
-    const user = this.users.find((u) => u.id === userId);
+    const user = this.users.find((u) => u.userId === userId);
     if (!user) return null;
     return user;
   }

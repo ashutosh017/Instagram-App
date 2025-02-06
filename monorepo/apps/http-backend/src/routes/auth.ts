@@ -11,6 +11,7 @@ export const authRouter:Router = express.Router();
 authRouter.post("/signin", async (req, res) => {
   const parsedSchema = signinSchema.safeParse(req.body);
   if (!parsedSchema.success) {
+    console.log(parsedSchema.error.errors)
     res.status(400).json({
       message: "Invalid credentials",
     });
@@ -44,7 +45,9 @@ authRouter.post("/signin", async (req, res) => {
 
 authRouter.post("/signup", async (req, res) => {
   const parsedSchema = signupSchema.safeParse(req.body);
+  console.log(req.body)
   if (!parsedSchema.success) {
+    console.log(parsedSchema.error.errors)
     res.status(400).json({
       message: "Invalid credentials",
     });
