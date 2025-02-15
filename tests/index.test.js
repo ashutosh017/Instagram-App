@@ -978,7 +978,7 @@ describe("Websockets tests", () => {
     const name = "name1";
     const username = name + Math.random();
     const email = username + "@gmail.com";
-  
+
     return {
       name,
       username,
@@ -991,7 +991,7 @@ describe("Websockets tests", () => {
     const name = "name2";
     const username = name + Math.random();
     const email = username + "@gmail.com";
-  
+
     return {
       name,
       username,
@@ -1007,21 +1007,21 @@ describe("Websockets tests", () => {
   let user1Socket;
   let user2Socket;
   beforeAll(async () => {
-    console.log(user1)
-    console.log(user2)
+    console.log(user1);
+    console.log(user2);
     const user1SignupRes = await axios.post(`${BACKEND_URL}/api/v1/signup`, {
-      name:user1.name,
-      email:user1.email,
-      username:user1.username,
-      password:user1.password,
-      profilePic:user1.profilePic
+      name: user1.name,
+      email: user1.email,
+      username: user1.username,
+      password: user1.password,
+      profilePic: user1.profilePic,
     });
     const user2SignupRes = await axios.post(`${BACKEND_URL}/api/v1/signup`, {
-      name:user2.name,
-      email:user2.email,
-      username:user2.username,
-      password:user2.password,
-      profilePic:user2.profilePic
+      name: user2.name,
+      email: user2.email,
+      username: user2.username,
+      password: user2.password,
+      profilePic: user2.profilePic,
     });
     const user1SigninRes = await axios.post(`${BACKEND_URL}/api/v1/signin`, {
       username: user1.username,
@@ -1031,52 +1031,58 @@ describe("Websockets tests", () => {
       username: user2.username,
       password: user2.password,
     });
-    console.log(user1SignupRes.data.message)
-    console.log(user2SignupRes.data.message)
-    console.log(user1SigninRes.data.message)
-    console.log(user2SigninRes.data.message)
-    expect(user1SignupRes.status).toBe(200)
-    expect(user2SignupRes.status).toBe(200)
-    expect(user1SigninRes.status).toBe(200)
-    expect(user2SigninRes.status).toBe(200)
+    console.log(user1SignupRes.data.message);
+    console.log(user2SignupRes.data.message);
+    console.log(user1SigninRes.data.message);
+    console.log(user2SigninRes.data.message);
+    expect(user1SignupRes.status).toBe(200);
+    expect(user2SignupRes.status).toBe(200);
+    expect(user1SigninRes.status).toBe(200);
+    expect(user2SigninRes.status).toBe(200);
 
-    user1Id = user1SignupRes.data.id
-    user2Id = user2SignupRes.data.id
+    user1Id = user1SignupRes.data.id;
+    user2Id = user2SignupRes.data.id;
 
     user1Token = user1SigninRes.data.token;
     user2Token = user2SigninRes.data.token;
 
-    user1Socket = new WebSocket(WS_URL+"?token="+user1Token)
-    user2Socket = new WebSocket(WS_URL+"?token="+user2Token)
+    user1Socket = new WebSocket(WS_URL + "?token=" + user1Token);
+    user2Socket = new WebSocket(WS_URL + "?token=" + user2Token);
 
-    await new Promise(r=>{
-      user1Socket.onopen = r
-    })
-    await new Promise(r=>{
-      user2Socket.onopen = r
-    })
+    await new Promise((r) => {
+      user1Socket.onopen = r;
+    });
+    await new Promise((r) => {
+      user2Socket.onopen = r;
+    });
   });
 
-  test.only("all events acknowledgement",async()=>{
-    const events = ['NEW_MESSAGE', 'STATUS', 
-      'FOLLOW', 'UNFOLLOW', 'LIKE', 'DISLIKE', 'COMMENT'
-    ]
-    events.forEach(e=>{
+  test.only("all events acknowledgement", async () => {
+    const events = [
+      "NEW_MESSAGE",
+      "STATUS",
+      "FOLLOW",
+      "UNFOLLOW",
+      "LIKE",
+      "DISLIKE",
+      "COMMENT",
+    ];
+    events.forEach((e) => {
       let msg = {
-        type:e,
-        recipientId:user2Id,
-        fromUserId:user1Id
+        type: e,
+        recipientId: user2Id,
+        fromUserId: user1Id,
+      };
+      if (e === "COMMENT") {
+        msg.comment = "comment";
       }
-      if(e==='COMMENT'){
-        msg.comment = "comment"
+      if (e === "NEW_MESSAGE") {
+        msg.message = "hello";
       }
-      if(e==='NEW_MESSAGE'){
-        msg.message="hello"
-      }
-      user2Socket.send(JSON.stringify(msg))
-      user2Socket.onmessage = (data)=>{
-        expect(data.type).toBe(e)
-      }
-    })
-  })
+      user2Socket.send(JSON.stringify(msg));
+      user2Socket.onmessage = (data) => {
+        expect(data.type).toBe(e);
+      };
+    });
+  });
 });

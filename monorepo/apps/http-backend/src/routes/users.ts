@@ -1,6 +1,6 @@
 import express from "express";
-import {Router} from 'express'
-export const usersRouter:Router = Router();
+import { Router } from "express";
+export const usersRouter: Router = Router();
 import db from "@repo/db/client";
 import {
   changePasswordSchema,
@@ -31,7 +31,7 @@ usersRouter.get("/search", async (req, res) => {
   });
 
   res.status(200).json({
-    users: users.map((u:any) => ({
+    users: users.map((u: any) => ({
       name: u.name,
       username: u.username,
       profilePic: u.profilePic,
@@ -209,10 +209,10 @@ usersRouter.post("/:userId/message", async (req, res) => {
           chatId: chat.id,
         },
       });
-      return msg.chatId
+      return msg.chatId;
     });
     res.status(200).json({
-      chatId:chatId,
+      chatId: chatId,
       message: "message sent successfully",
     });
   } catch (error) {
@@ -227,7 +227,6 @@ usersRouter.put("/profile", async (req, res) => {
   if (!parsedSchema.success) {
     res.status(400).json({
       message: "error validating data",
-      
     });
     return;
   }
@@ -235,7 +234,7 @@ usersRouter.put("/profile", async (req, res) => {
   try {
     await db.user.update({
       where: {
-        id: req.userId, 
+        id: req.userId,
       },
       data: {
         name,
@@ -330,7 +329,7 @@ usersRouter.get("/followers", async (req, res) => {
       },
     });
     res.status(200).json({
-      followers: followers.map((f:any) => ({
+      followers: followers.map((f: any) => ({
         name: f.follower.name,
         username: f.follower.username,
         profilePic: f.follower.profilePic,
@@ -361,7 +360,7 @@ usersRouter.get("/following", async (req, res) => {
       },
     });
     res.status(200).json({
-      followers: following.map((f:any) => ({
+      followers: following.map((f: any) => ({
         name: f.user.name,
         username: f.user.username,
         profilePic: f.user.profilePic,
@@ -379,7 +378,7 @@ usersRouter.get("/:userId/posts", async (req, res) => {
   const userId = req.params.userId;
   const limit = parseInt(req.query.limit as string, 10) || 10;
   const offset = parseInt(req.query.offset as string, 10) || 0;
-  if (!userId ) {
+  if (!userId) {
     res.status(400).json({
       message: "provide user id",
     });
@@ -393,17 +392,17 @@ usersRouter.get("/:userId/posts", async (req, res) => {
         userId: userId,
       },
       include: {
-        comments:{
+        comments: {
           select: commentSelect(2),
-        }
+        },
       },
     });
     res.status(200).json({
-      posts: posts.map((p:any) => ({
+      posts: posts.map((p: any) => ({
         postId: p.id,
         postUrl: p.url,
         likes: p.likes,
-        comments: p.comments.map((c:any) => ({
+        comments: p.comments.map((c: any) => ({
           comment: c.text,
           likes: c.likes,
         })),
@@ -436,7 +435,7 @@ usersRouter.get("/feed", async (req, res) => {
                 url: true,
                 likes: true,
                 comments: {
-                  select:commentSelect(10),
+                  select: commentSelect(10),
                 },
                 dateCreated: true,
                 description: true,
@@ -448,11 +447,11 @@ usersRouter.get("/feed", async (req, res) => {
       },
     });
     res.status(200).json({
-      feed: feed.map((f:any) => ({
-        post: f.user.posts.map((p:any) => ({
+      feed: feed.map((f: any) => ({
+        post: f.user.posts.map((p: any) => ({
           postUrl: p.url,
           dateCreated: p.dateCreated,
-          comments: p.comments.map((c:any) => ({
+          comments: p.comments.map((c: any) => ({
             comment: c.text,
             dateAdded: c.dateAdded,
             likes: c.likes,
@@ -468,5 +467,3 @@ usersRouter.get("/feed", async (req, res) => {
     });
   }
 });
-
-
