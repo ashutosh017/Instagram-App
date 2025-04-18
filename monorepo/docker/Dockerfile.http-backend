@@ -1,0 +1,27 @@
+
+FROM node:23-slim
+
+ARG DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
+
+WORKDIR /usr/src/app
+
+RUN npm i -g pnpm
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
+
+COPY packages ./packages
+
+COPY apps/http-backend ./apps/http-backend
+
+RUN pnpm install
+
+RUN apt-get update && apt-get install -y openssl
+
+RUN pnpm --filter=db prisma generate
+
+RUN pnpm build --filter=http-backend...
+
+WORKDIR /usr/src/app/apps/http-backend
+
+CMD ["pnpm", "dev:docker"]

@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres
+    container_name: instagram-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: instagram-user
+      POSTGRES_PASSWORD: ig-password
+      POSTGRES_DB: ig-pg-db
+    volumes:
+      - instagram-volume:/var/lib/postgresql/data
+    networks:
+      - instagram-network
+
+  http-backend:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.http-backend
+      args:
+        DATABASE_URL: "postgresql://instagram-user:ig-password@instagram-postgres:5432/ig-pg-db"
+    container_name: http-backend
+    environment:
+      DATABASE_URL: "postgres://instagram-user:ig-password@instagram-postgres:5432/ig-pg-db"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+    networks:
+      - instagram-network
+
+  ws-backend:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.ws-backend
+      args:
+        DATABASE_URL: "postgresql://instagram-user:ig-password@instagram-postgres:5432/ig-pg-db"
+    container_name: ws-backend
+    environment:
+      DATABASE_URL: "postgres://instagram-user:ig-password@instagram-postgres:5432/ig-pg-db"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks:
+      - instagram-network
+
+volumes:
+  instagram-volume:
+
+networks:
+  instagram-network:
+    driver: bridge

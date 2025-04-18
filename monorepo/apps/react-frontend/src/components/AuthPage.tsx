@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router";
 
 const BACKEND_URL = "http://localhost:3000"; // Fixed typo
 
@@ -10,38 +11,40 @@ export default function AuthPage() {
   const usernameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
 
   const handleAuth = async (event: React.FormEvent) => {
-    event.preventDefault(); // Prevent default form submission behavior
-
+    event.preventDefault();
     console.log("handleAuth called");
 
-    if (!usernameRef.current?.value || !passwordRef.current?.value) {
+    if (
+      !usernameRef.current?.value ||
+      !passwordRef.current?.value ||
+      !emailRef.current?.value
+    ) {
       console.log("returning");
       return;
     }
 
     try {
-      const endpoint = isSignUp ? "/api/v1/signup" : "/api/v1/signin";
-      const payload = isSignUp
-        ? {
-            name: nameRef.current?.value,
-            email: emailRef.current?.value,
-            username: usernameRef.current?.value,
-            password: passwordRef.current?.value,
-            profilePic: "https://sample-profile-pic.com",
-          }
-        : {
-            username: usernameRef.current?.value,
-            password: passwordRef.current?.value,
-          };
-
-      const res = await axios.post(`${BACKEND_URL}${endpoint}`, payload);
-
-      console.log(res.status);
-      console.log(res.data);
+      if (isSignUp) {
+        await axios.post(`${BACKEND_URL}/api/v1/signup`, {
+          username: usernameRef.current.value,
+          password: passwordRef.current.value,
+          email: emailRef.current.value,
+          name: nameRef.current?.value,
+          profilePic: "https://profile-pic.com",
+        });
+      }
+      const signInRes = await axios.post(`${BACKEND_URL}/api/v1/signin`, {
+        username: usernameRef.current.value,
+        password: passwordRef.current.value,
+      });
+      const token = signInRes.data.token;
+      localStorage.setItem("token", token);
+      navigate("/feed");
     } catch (error) {
-      console.log("Some error occurred: ", error);
+      console.log("some error occured: ", error);
     }
   };
 

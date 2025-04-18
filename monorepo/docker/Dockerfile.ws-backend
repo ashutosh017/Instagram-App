@@ -1,0 +1,26 @@
+FROM node:23-slim
+
+ARG DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
+
+WORKDIR /usr/src/app
+
+RUN npm i -g pnpm
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
+
+COPY packages ./packages
+
+COPY apps/ws-backend ./apps/ws-backend
+
+RUN pnpm install
+
+RUN apt-get update && apt-get install -y openssl
+
+RUN pnpm --filter=db prisma generate
+
+RUN pnpm turbo run build --filter=ws-backend...
+
+WORKDIR /usr/src/app/apps/ws-backend
+
+CMD ["pnpm", "dev:docker"]
