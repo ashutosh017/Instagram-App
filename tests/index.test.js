@@ -1057,7 +1057,7 @@ describe("Websockets tests", () => {
     });
   });
 
-  test.only("all events acknowledgement", async () => {
+  test("all events acknowledgement", async () => {
     const events = [
       "NEW_MESSAGE",
       "STATUS",
