@@ -8,7 +8,7 @@ import { chatsRouter } from './routes/chats';
 import { notificationsRouter } from './routes/notifications';
 import cors from 'cors'
 
-const PORT = 3000;
+const PORT = 3001;
 const app = express();
 
 app.use(cors());

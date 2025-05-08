@@ -35,6 +35,7 @@ authRouter.post("/signin", async (req, res) => {
     res.status(400).json({
       message: "either username or password is wrong",
     });
+    return;
   }
   const token = jwt.sign(user.id, JWT_SECRET);
   res.status(200).json({
