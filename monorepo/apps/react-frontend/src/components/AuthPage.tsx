@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router";
 
-const BACKEND_URL = "http://localhost:3000"; // Fixed typo
+const BACKEND_URL = "http://localhost:3001"; // Fixed typo
 
 export default function AuthPage() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -18,16 +18,31 @@ export default function AuthPage() {
     console.log("handleAuth called");
 
     if (
-      !usernameRef.current?.value ||
       !passwordRef.current?.value ||
-      !emailRef.current?.value
+      (!usernameRef.current?.value && !emailRef.current?.value)
     ) {
-      console.log("returning");
+      console.log("usern: ", usernameRef.current?.value);
+      console.log("pass: ", passwordRef.current?.value);
+      console.log("email: ", emailRef.current?.value);
+
+      console.log("returning1");
       return;
     }
 
     try {
       if (isSignUp) {
+        if (
+          !passwordRef.current?.value ||
+          !usernameRef.current?.value ||
+          !emailRef.current?.value
+        ) {
+          console.log("usern: ", usernameRef.current?.value);
+          console.log("pass: ", passwordRef.current?.value);
+          console.log("email: ", emailRef.current?.value);
+
+          console.log("returning");
+          return;
+        }
         await axios.post(`${BACKEND_URL}/api/v1/signup`, {
           username: usernameRef.current.value,
           password: passwordRef.current.value,
@@ -35,6 +50,9 @@ export default function AuthPage() {
           name: nameRef.current?.value,
           profilePic: "https://profile-pic.com",
         });
+      }
+      if (!usernameRef.current?.value) {
+        return;
       }
       const signInRes = await axios.post(`${BACKEND_URL}/api/v1/signin`, {
         username: usernameRef.current.value,

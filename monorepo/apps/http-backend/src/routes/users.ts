@@ -11,6 +11,26 @@ import {
 import bcrypt from "bcrypt";
 import { commentSelect } from "../config";
 
+usersRouter.get("/",async(req,res)=>{
+  try {
+    const resp = await db.user.findUnique({
+      where:{
+        id:req.userId
+      }
+    })
+    res.status(200).json({
+      data:resp,
+      msg:"success"
+    })
+  } catch (error) 
+  {
+    res.status(400).json({
+      msg:"error getting details"
+    })
+    
+  }
+})
+
 usersRouter.get("/search", async (req, res) => {
   const name = req.query.name;
   if (!name || typeof name !== "string") {
