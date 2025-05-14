@@ -16,10 +16,20 @@ usersRouter.get("/",async(req,res)=>{
     const resp = await db.user.findUnique({
       where:{
         id:req.userId
+      }, include:{
+        posts:{
+          select:{
+            id:true
+          }
+        }
       }
     })
+    const postsCount = resp?.posts.length ?? 0;
     res.status(200).json({
-      data:resp,
+      data:{
+        ...resp,
+        postsCount
+      },
       msg:"success"
     })
   } catch (error) 
@@ -250,7 +260,7 @@ usersRouter.put("/profile", async (req, res) => {
     });
     return;
   }
-  const { name, username, profilePic, about, gender } = parsedSchema.data;
+  const { name, username, profilePic, about } = parsedSchema.data;
   try {
     await db.user.update({
       where: {
@@ -261,7 +271,6 @@ usersRouter.put("/profile", async (req, res) => {
         username,
         profilePic,
         description: about,
-        gender,
       },
     });
 

@@ -26,12 +26,12 @@ export const sendMessageSchema = z.object({
 });
 
 export const editProfileSchema = z.object({
-  name: z.string().min(3).max(100).optional(),
-  email: z.string().min(3).max(100).email().optional(),
-  username: z.string().min(3).max(100).optional(),
-  password: z.string().min(3).max(100).optional(),
-  profilePic: z.string().min(3).max(100).optional(),
-  about: z.string().max(200).optional(),
+  name: z.string().min(0).max(100).optional(),
+  email: z.string().min(0).max(100).email().optional(),
+  username: z.string().min(0).max(100).optional(),
+  password: z.string().min(0).max(100).optional(),
+  profilePic: z.string().min(0).max(2000).optional(),
+  about: z.string().max(2000).optional(),
   gender: z.enum(["MALE", "FEMALE", "PREFER_NOT_TO_SAY"]).optional(),
   DOB: z.coerce.date().optional(),
 });

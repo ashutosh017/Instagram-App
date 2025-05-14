@@ -9,11 +9,14 @@ export const authMiddleware = async (
   next: NextFunction
 ) => {
   try {
+    console.log("req.headers ", req.headers);
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      console.log("auth header not found  ");
       throw new Error("auth header not found");
     }
     const token = authHeader.split(" ")[1];
+    console.log("token ", token); 
     if (!token) {
       throw new Error("token not found");
     }
@@ -30,6 +33,7 @@ export const authMiddleware = async (
   } catch (e) {
     res.status(403).json({
       message: "Unauthorized",
+      error: e,
     });
     return;
   }
